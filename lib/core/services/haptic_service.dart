@@ -25,6 +25,12 @@ class HapticService {
     } catch (_) {}
   }
 
+  static Future<void> success() async {
+    try {
+      await HapticFeedback.mediumImpact();
+    } catch (_) {}
+  }
+
   static Future<void> error() async {
     try {
       await HapticFeedback.vibrate();

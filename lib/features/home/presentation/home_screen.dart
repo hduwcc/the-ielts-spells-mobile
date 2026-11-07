@@ -24,9 +24,10 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentTabIndex = 0;
 
   StreakModel? _streak;
-  String _enrolledCourseCode = 'IELTS 2026-0011';
-  int _todayXp = 35;
+  String? _enrolledCourseCode;
+  int _todayXp = 0;
   int _dailyGoalXp = 100;
+  int _unreadNotifications = 0;
   bool _isLoading = true;
 
   @override
@@ -47,9 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) {
       setState(() {
         _streak = StreakModel.fromJson(data['streak'] as Map<String, dynamic>);
-        _enrolledCourseCode = data['enrolledCourseCode'] ?? 'IELTS 2026-0011';
-        _todayXp = _streak?.todayXp ?? 35;
+        _enrolledCourseCode = data['enrolledCourseCode']; // null nếu học viên chưa vào lớp
+        _todayXp = _streak?.todayXp ?? 0;
         _dailyGoalXp = _streak?.dailyGoalXp ?? 100;
+        _unreadNotifications = data['unreadNotificationsCount'] ?? 0;
         _isLoading = false;
       });
     }
@@ -196,9 +198,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 14),
 
-            // 7. Feature Card 4: Bảng xếp hạng Lớp IELTS [Code] (Gold Card)
-            _buildLeaderboardGoldCard(),
-            const SizedBox(height: 20),
+            // 7. Feature Card 4: Bảng xếp hạng Lớp IELTS (Chỉ hiển thị khi học viên THẬT SỰ CÓ LỚP HỌC)
+            if (_enrolledCourseCode != null && _enrolledCourseCode!.isNotEmpty) ...[
+              _buildLeaderboardGoldCard(),
+              const SizedBox(height: 14),
+            ],
+            const SizedBox(height: 6),
 
             // 8. Bottom Mountain Decoration Artwork
             Center(
@@ -281,12 +286,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-        // Notification Bell Icon with Badge "3"
+        // Notification Bell Icon (Chỉ hiển thị badge đỏ khi có thông báo thật)
         GestureDetector(
           onTap: () {
             HapticService.selection();
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Bạn có 3 thông báo bài học mới từ giáo viên.')),
+              SnackBar(
+                content: Text(
+                  _unreadNotifications > 0
+                      ? 'Bạn có $_unreadNotifications thông báo mới.'
+                      : 'Hộp thông báo trống. Bạn chưa có thông báo mới nào.',
+                ),
+              ),
             );
           },
           child: Container(
@@ -304,28 +315,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Color(0xFF2B1F24),
                   size: 22,
                 ),
-                Positioned(
-                  top: 7,
-                  right: 7,
-                  child: Container(
-                    width: 14,
-                    height: 14,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFE03E5D),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Text(
-                        '3',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 8.5,
-                          fontWeight: FontWeight.bold,
+                if (_unreadNotifications > 0)
+                  Positioned(
+                    top: 7,
+                    right: 7,
+                    child: Container(
+                      width: 14,
+                      height: 14,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFE03E5D),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$_unreadNotifications',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -455,9 +467,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 10),
 
-                const Text(
-                  '✨ Tiếp tục học tập để chinh phục mục tiêu của bạn!',
-                  style: TextStyle(
+                Text(
+                  _todayXp > 0
+                      ? '✨ Tiếp tục học tập để chinh phục mục tiêu của bạn!'
+                      : '✨ Bắt đầu ngày mới bằng việc ôn 5 từ vựng hoặc chơi 1 mini-game!',
+                  style: const TextStyle(
                     fontSize: 11.5,
                     color: Color(0xFF66555C),
                     height: 1.3,

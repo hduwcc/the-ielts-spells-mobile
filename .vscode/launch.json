@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "The IELTS Spells Mobile (Chrome - Port 3002)",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "chrome",
+      "args": [
+        "--web-port=3002",
+        "--web-hostname=localhost"
+      ]
+    }
+  ]
+}

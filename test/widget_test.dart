@@ -1,9 +1,32 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:the_ielts_spells_mobile/features/auth/presentation/login_screen.dart';
 import 'package:the_ielts_spells_mobile/features/home/presentation/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  testWidgets('Login screen smoke test', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.5;
+    addTearDown(() => tester.view.resetPhysicalSize());
+
+    SharedPreferences.setMockInitialValues({});
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: LoginScreen(),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('The IELTS Spells'), findsOneWidget);
+    expect(find.text('Chào mừng trở lại'), findsOneWidget);
+    expect(find.text('Google'), findsOneWidget);
+    expect(find.text('Facebook'), findsOneWidget);
+    expect(find.text('Đăng ký ngay'), findsOneWidget);
+  });
+
   testWidgets('Home screen smoke test', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2.5;

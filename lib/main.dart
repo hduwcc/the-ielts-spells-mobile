@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'core/config/app_config.dart';
 import 'core/services/audio_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/app_version/presentation/splash_screen.dart';
@@ -20,6 +22,16 @@ void main() async {
 
   // Initialize Audio & Sound effects
   await AudioService.init();
+
+  // Initialize Supabase Auth for Google OAuth and session management
+  try {
+    await Supabase.initialize(
+      url: AppConfig.supabaseUrl,
+      anonKey: AppConfig.supabaseAnonKey,
+    );
+  } catch (e) {
+    debugPrint('Supabase initialization info: $e');
+  }
 
   runApp(
     const ProviderScope(

@@ -1,0 +1,3 @@
+@echo off
+echo >>> Khoi chay The IELTS Spells Mobile tren Chrome Port 3002...
+"C:\Users\GOSU\Desktop\flutter_windows_3.47.9-stable\flutter\bin\flutter.bat" run -d chrome --web-port=3002

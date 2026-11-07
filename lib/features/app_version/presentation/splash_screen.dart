@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/network/api_client.dart';
+import '../../../core/services/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../auth/presentation/login_screen.dart';
 import '../../home/presentation/home_screen.dart';
 import '../models/app_version_info.dart';
 import 'force_update_dialog.dart';
@@ -40,9 +42,10 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _performVersionCheckAndProceed() async {
-    // Keep splash animation visible for at least 1.2 seconds for brand presence
+    // Check app remote config + initialize auth status from local storage
     final results = await Future.wait([
       ApiClient.checkAppVersion(),
+      AuthService.init(),
       Future.delayed(const Duration(milliseconds: 1200)),
     ]);
 
@@ -77,21 +80,24 @@ class _SplashScreenState extends State<SplashScreen>
           versionInfo: versionInfo,
           onContinue: () {
             Navigator.pop(context);
-            _navigateToHome();
+            _navigateToNextScreen();
           },
         ),
       );
     } else {
-      _navigateToHome();
+      _navigateToNextScreen();
     }
   }
 
-  void _navigateToHome() {
+  void _navigateToNextScreen() {
+    // If user has valid authenticated session -> HomeScreen; otherwise -> LoginScreen
+    final Widget destination = AuthService.isAuthenticated ? const HomeScreen() : const LoginScreen();
+
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 500),
-        pageBuilder: (_, __, ___) => const HomeScreen(),
+        pageBuilder: (_, __, ___) => destination,
         transitionsBuilder: (_, animation, __, child) {
           return FadeTransition(opacity: animation, child: child);
         },

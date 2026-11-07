@@ -393,6 +393,5 @@ class _CollocationCard {
     required this.text,
     required this.isLeft,
     required this.pairId,
-    this.isMatched = false,
-  });
+  }) : isMatched = false;
 }
